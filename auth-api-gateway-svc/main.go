@@ -4,13 +4,25 @@ import (
 	"context"
 	"log"
 	"mini-project/hellopb"
+	"os"
 
+	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 )
 
+const ROOT_DIR = "../"
+
 func main() {
+	// Set Config with GoDotEnv\
+	err := godotenv.Load(ROOT_DIR + ".env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	MAIN_SVC_PORT := os.Getenv("MAIN_SVC_PORT")
+
 	var conn *grpc.ClientConn
-	conn, err := grpc.Dial(":3001", grpc.WithInsecure())
+	conn, err = grpc.Dial(MAIN_SVC_PORT, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %s", err)
 	}
