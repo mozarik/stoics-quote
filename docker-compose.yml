@@ -1,0 +1,20 @@
+version: "3"
+
+services:
+  main-svc:
+    env_file:
+        - ./main-svc/.env
+    build:
+      context: ./main-svc
+      dockerfile: Dockerfile
+    ports:
+      - 3001:3001
+  api-gateway-svc:
+    env_file:
+        - ./auth-api-gateway-svc/.env
+    build:
+      context: ./auth-api-gateway-svc
+      dockerfile: Dockerfile
+    ports:
+      - 3002:3002
+    

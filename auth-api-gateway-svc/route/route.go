@@ -9,18 +9,22 @@ import (
 )
 
 type Route struct {
+	BaseURL string
 }
 
 type Data struct {
 	Message string `json:"message"`
 }
 
-func NewRoute() *Route {
-	return &Route{}
+func NewRoute(MAIN_SVC_HOST string) *Route {
+	return &Route{
+		BaseURL: MAIN_SVC_HOST,
+	}
 }
 
 func (r Route) PingMainService(c echo.Context) error {
-	req, err := http.NewRequest(http.MethodGet, "http://localhost:3001/ping", nil)
+	url := r.BaseURL + "/ping"
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return c.JSON(http.StatusNoContent, err)
 	}
