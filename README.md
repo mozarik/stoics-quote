@@ -5,4 +5,5 @@ This is a mini project that i worked on for Alterra Academy MBKM. This is a micr
 
 # TODO
 
-- [ ] Create simple connection of hello from Client - auth-api-gateway service - main service
+- [x] Create connection of two microservice the gateway anwd main-svc
+- [ ] Create the docker-compose file
