@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/labstack/echo/v4"
@@ -13,13 +12,10 @@ type Data struct {
 }
 
 func main() {
-	// The port the service will be listening to
-	// err := godotenv.Load(".env")
-	// if err != nil {
-	// 	log.Fatal("Error loading .env file")
-	// }
+
+	// PUT ALL ENV HERE
 	SERVICE_PORT := os.Getenv("SERVICE_PORT")
-	fmt.Println(SERVICE_PORT)
+
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.GET("/ping", func(c echo.Context) error {

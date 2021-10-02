@@ -3,7 +3,7 @@ info:
   title: List API for Stoics Quotes Mini Project Alterra
   version: '1.0'
 servers:
-  - url: http://localhost:1001/v1
+  - url: http://localhost:3001/v1
     description: Development Server For Stoics Quotes 
 paths:
   /ping:
