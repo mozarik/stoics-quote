@@ -26,7 +26,7 @@ func (m MockUserRepository) FindByUsername(username string) (*domain.User, error
 	return nil, nil
 }
 
-func (m MockUserRepository) Delete(id int) error{}{
+func (m MockUserRepository) Delete(id int) error {
 	return nil
 }
 
