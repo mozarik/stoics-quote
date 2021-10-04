@@ -18,7 +18,15 @@ func (m MockUserRepository) FindByID(id int) (*domain.User, error) {
 	args := m.Called(id)
 	return args.Get(0).(*domain.User), args.Error(1)
 }
-func (m MockUserRepository) Store(user domain.User) error {
+func (m MockUserRepository) Store(user domain.User) (*domain.User, error) {
+	return nil, nil
+}
+
+func (m MockUserRepository) FindByUsername(username string) (*domain.User, error) {
+	return nil, nil
+}
+
+func (m MockUserRepository) Delete(id int) error{}{
 	return nil
 }
 
