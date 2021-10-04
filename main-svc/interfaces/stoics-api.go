@@ -2,13 +2,15 @@ package interfaces
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
+	"time"
 )
 
 type QuoteGetter interface {
-	GetQuoteRadom() (Quote, error)
+	GetQuoteResponseBody() ([]byte, error)
 }
 
 type Quote struct {
@@ -18,23 +20,53 @@ type Quote struct {
 	QuoteSource string `json:"quotesource"`
 }
 
-func (q Quote) GetQuoteRadom() (Quote, error) {
-	url := "http://stoic-server.herokuapp.com/random"
-	response, err := http.Get(url)
+// HTTPClient interface
+type HTTPClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
+var (
+	Client HTTPClient
+)
+
+func init() {
+	Client = &http.Client{}
+}
+
+type QuoteGetterImpl struct {
+	QuoteGetter QuoteGetter
+}
+
+func RandomNumberRange(min, max int) int {
+	rand.Seed(time.Now().UnixNano())
+	n := min + rand.Intn(max-min+1)
+	return n
+}
+
+// This function get the Quote from this endpoint
+// https://stoic-server.herokuapp.com/quotes/{:id}
+// We try to randomize the ID
+func GetQuoteFromThirdPartyAPI() (Quote, error) {
+	id := RandomNumberRange(1, 1000)
+	url := fmt.Sprintf("https://stoic-server.herokuapp.com/quotes/%d", id)
+	request, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		log.Printf("Cannot getting response from %v %v", url, err)
+		log.Printf("cannot create request error: %v", err)
+		return Quote{}, err
+	}
+	response, err := Client.Do(request)
+	if err != nil {
+		log.Printf("cannot do request error: %v", err)
+		return Quote{}, err
+	}
+	defer response.Body.Close()
+
+	var quote []Quote
+	err = json.NewDecoder(response.Body).Decode(&quote)
+	if err != nil {
+		log.Printf("cannot decode response data to Quote struct error: %v", err)
+		return Quote{}, err
 	}
 
-	responseData, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Printf("cannot read response data to []byte error: %v", err)
-	}
-
-	var quote Quote
-	err = json.Unmarshal(responseData, &quote)
-	if err != nil {
-		log.Printf("cannot unmarshal response data to Quote struct error: %v", err)
-	}
-
-	return quote, err
+	return quote[0], nil
 }
