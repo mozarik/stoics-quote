@@ -8,17 +8,16 @@ import (
 type QuoteRepo DbRepo
 
 // Implement domain.QuoteRepository interface
-
 func (repo QuoteRepo) Save(quote domain.Quote) error {
 	query := `INSERT INTO quotes (id, body, author, quote_source) VALUES (@id, @body, @author, @quote_source)`
 	err := repo.DB.Exec(query,
 		sql.Named("id", quote.ID),
 		sql.Named("body", quote.Body),
 		sql.Named("author", quote.Author),
-		sql.Named("quote_source", quote.QuoteSource))
+		sql.Named("quote_source", quote.QuoteSource)).Error
 
 	if err != nil {
-		return err.Error
+		return err
 	}
 
 	return nil
@@ -26,7 +25,7 @@ func (repo QuoteRepo) Save(quote domain.Quote) error {
 
 func (repo QuoteRepo) FindUserFavorites(userID int) ([]domain.Quote, error) {
 	query := `SELECT q.id, q.body, q.author, q.quote_source FROM quotes q
-	JOIN userfavoritesquotes on (q.id = userfavoritesquotes.quotes_id)
+	JOIN userfavoritesquotes on (q.id = userfavoritesquotes.quote_id)
 	JOIN users ON (users.id = userfavoritesquotes.user_id)
 	WHERE users.id = @userID`
 

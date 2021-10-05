@@ -19,6 +19,14 @@ type User struct {
 	Username string
 }
 
+func newUserFromDomain(user *domain.User) User {
+	return User{
+		ID:       user.ID,
+		Name:     user.Name,
+		Username: user.Username,
+	}
+}
+
 type UserFavoriteQuotes struct {
 	User  User
 	Quote []domain.Quote
@@ -36,6 +44,12 @@ func (i UserInteractor) ShowUserDataBasedOnID(userID int) (User, error) {
 	return userData, nil
 }
 
+// Check if userID is in the database
+func (i UserInteractor) UserExists(userID int) bool {
+	_, err := i.UserRepository.FindByID(userID)
+	return err == nil
+}
+
 func (q QuoteInteractor) UserSaveFavoriteQuote(userID int, quoteID int) error {
 	// Check the quote id in the database
 	// - if not save the quote in the database to quotes table
@@ -49,17 +63,24 @@ func (q QuoteInteractor) ListAllFavoriteQuotes(userID int) (UserFavoriteQuotes, 
 	if !userExist {
 		return UserFavoriteQuotes{}, domain.ErrorUserNotFound
 	}
+	// Get the user data based on id
+	ud, err := q.UserInteractor.UserRepository.FindByID(userID)
+	if err != nil {
+		return UserFavoriteQuotes{}, domain.ErrorUserNotFound
+	}
+	// Format user from domain to usecase
+	userData := newUserFromDomain(ud)
 	// Get all quotes from the UserFavoriteQutes table based on userID
 	quotes, err := q.QuoteRepository.FindUserFavorites(userID)
 	if err != nil {
 		return UserFavoriteQuotes{}, err
 	}
-	// Format/Aggregate data from repository to UserFavoriteQuotes
-	return UserFavoriteQuotes{}, nil
-}
 
-// Check if userID is in the database
-func (i UserInteractor) UserExists(userID int) bool {
-	_, err := i.UserRepository.FindByID(userID)
-	return err == nil
+	// Format/Aggregate data from repository to UserFavoriteQuotes
+	aggregate := UserFavoriteQuotes{
+		User:  userData,
+		Quote: quotes,
+	}
+
+	return aggregate, nil
 }
