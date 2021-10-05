@@ -58,8 +58,8 @@ func (q QuoteInteractor) ListAllFavoriteQuotes(userID int) (UserFavoriteQuotes, 
 	return UserFavoriteQuotes{}, nil
 }
 
+// Check if userID is in the database
 func (i UserInteractor) UserExists(userID int) bool {
-	// Check if userID is in the database
 	_, err := i.UserRepository.FindByID(userID)
 	return err == nil
 }
