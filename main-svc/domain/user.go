@@ -7,8 +7,11 @@ var (
 )
 
 type UserRepository interface {
+	// This find the user by id and return the user object (with password data)
 	FindByID(id int) (*User, error)
+	// This store the user by id and return the user object that we save
 	Store(user User) (*User, error)
+	// This delete the user from the repository by id
 	Delete(id int) error
 }
 

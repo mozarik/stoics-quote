@@ -34,6 +34,16 @@ func setup(t *testing.T) {
 		"password": "password",
 	}).Error
 	assert.NoError(t, err)
+
+	// Insert 1 more user
+	err = gdb.Exec("INSERT INTO users (id, name, username, password) VALUES (@id, @name, @username, @password)", map[string]interface{}{
+		"id":       2,
+		"name":     "John Doe2",
+		"username": "johndoe",
+		"password": "password",
+	}).Error
+
+	assert.NoError(t, err)
 	// Insert 2 quotes
 	err = gdb.Exec("INSERT INTO quotes (id, body, author, quote_source) VALUES (@id, @body, @author, @quote_source)", map[string]interface{}{
 		"id":           1,
@@ -67,6 +77,39 @@ func setup(t *testing.T) {
 		gdb.Exec("DELETE FROM users")
 		gdb.Exec("DELETE FROM quotes")
 		gdb.Exec("DELETE FROM userfavoritesquotes")
+	})
+}
+
+func TestFindByID(t *testing.T) {
+	gdb, err := gorm.Open(sqlite.Open("gorm.db"), &gorm.Config{})
+	assert.NoError(t, err)
+
+	quoteRepo := interfaces.QuoteRepo{
+		DB: gdb,
+	}
+
+	setup(t)
+
+	t.Run("SUCCESSFULL PATH: return quote by the quote id in quotes table", func(t *testing.T) {
+		quote, err := quoteRepo.FindByID(1)
+		assert.NoError(t, err)
+
+		want := &domain.Quote{
+			ID:          1,
+			Body:        "I'm a quote",
+			Author:      "John Doe",
+			QuoteSource: "john books",
+		}
+
+		got := quote
+
+		assert.Equal(t, want, got)
+
+	})
+
+	t.Run("FAILURE PATH: return error if quote id is not found in quotes table", func(t *testing.T) {
+		_, err := quoteRepo.FindByID(3)
+		assert.Error(t, err)
 	})
 }
 
@@ -145,4 +188,34 @@ func TestQuoteRepo_Save(t *testing.T) {
 			deleteAllRecords(t, tt.fields.DB)
 		})
 	}
+}
+
+func TestSaveUserFavorite(t *testing.T) {
+	gdb, err := gorm.Open(sqlite.Open("gorm.db"), &gorm.Config{})
+	assert.NoError(t, err)
+
+	quoteRepo := interfaces.QuoteRepo{
+		DB: gdb,
+	}
+
+	setup(t)
+
+	t.Run("Successful save user favorite to link table (userfavoritesquotes)", func(t *testing.T) {
+		err := quoteRepo.SaveUserFavorite(2, 1)
+		assert.NoError(t, err)
+
+		// Make sure the record was inserted
+		var tempStruct struct {
+			UserID  int
+			QuoteID int
+		}
+		row := gdb.Raw("SELECT user_id, quote_id FROM userfavoritesquotes WHERE user_id = ? AND quote_id = ?", 2, 1).Row()
+		err = row.Scan(&tempStruct.UserID, &tempStruct.QuoteID)
+		assert.NoError(t, err)
+
+		assert.Equal(t, 2, tempStruct.UserID)
+		assert.Equal(t, 1, tempStruct.QuoteID)
+
+	})
+
 }

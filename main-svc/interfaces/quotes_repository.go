@@ -23,6 +23,28 @@ func (repo QuoteRepo) Save(quote domain.Quote) error {
 	return nil
 }
 
+func (repo QuoteRepo) FindByID(id int) (*domain.Quote, error) {
+	query := `SELECT id, body, author, quote_source FROM quotes WHERE id = @id`
+
+	var quote domain.Quote
+	row := repo.DB.Debug().Raw(query, sql.Named("id", id)).Row()
+	err := row.Scan(&quote.ID, &quote.Body, &quote.Author, &quote.QuoteSource)
+	if err != nil {
+		return nil, err
+	}
+
+	return &quote, nil
+}
+
+func (repo QuoteRepo) SaveUserFavorite(userID int, quoteID int) error {
+	query := `INSERT INTO userfavoritesquotes (user_id, quote_id) VALUES (@userID, @quoteID)`
+	err := repo.DB.Exec(query, sql.Named("userID", userID), sql.Named("quoteID", quoteID)).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (repo QuoteRepo) FindUserFavorites(userID int) ([]domain.Quote, error) {
 	query := `SELECT q.id, q.body, q.author, q.quote_source FROM quotes q
 	JOIN userfavoritesquotes on (q.id = userfavoritesquotes.quote_id)

@@ -42,6 +42,15 @@ func (m MockQuoteRepository) FindUserFavorites(userID int) ([]domain.Quote, erro
 	return args.Get(0).([]domain.Quote), args.Error(1)
 }
 
+func (m MockQuoteRepository) FindByID(id int) (*domain.Quote, error) {
+	args := m.Called(id)
+	return args.Get(0).(*domain.Quote), args.Error(1)
+}
+
+func (m MockQuoteRepository) SaveUserFavorite(userID, quoteID int) error {
+	return nil
+}
+
 func TestShowUserDataBasedOnID_WithMock(t *testing.T) {
 	mock := new(MockUserRepository)
 
@@ -135,5 +144,42 @@ func TestQuoteInteractor_ListAllFavoriteQuotes(t *testing.T) {
 
 		assert.Equal(t, want, got)
 
+	})
+}
+
+func TestUserSavedFavoriteQuote(t *testing.T) {
+	mockQuote := new(MockQuoteRepository)
+	mockUser := new(MockUserRepository)
+
+	quoteInteractor := usecases.QuoteInteractor{
+		QuoteRepository: mockQuote,
+		UserInteractor: usecases.UserInteractor{
+			UserRepository: mockUser,
+		},
+	}
+
+	t.Run("HAPPY PATH: Only test the happy path, because cant mock UserExist", func(t *testing.T) {
+		mockQuote.On("FindByID", 1).Return(&domain.Quote{
+			ID:          1,
+			Body:        "Quote 1",
+			Author:      "Author 1",
+			QuoteSource: "Source 1",
+		}, nil)
+
+		mockUser.On("FindByID", 1).Return(&domain.User{
+			ID:       1,
+			Name:     "John Doe",
+			Username: "johndoe",
+		}, nil)
+
+		quote := domain.Quote{
+			ID:          1,
+			Body:        "Quote 1",
+			Author:      "Author 1",
+			QuoteSource: "Source 1",
+		}
+
+		err := quoteInteractor.UserSaveFavoriteQuote(1, quote)
+		assert.NoError(t, err)
 	})
 }

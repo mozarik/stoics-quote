@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"log"
 	"main-svc/domain"
 )
 
@@ -50,10 +51,39 @@ func (i UserInteractor) UserExists(userID int) bool {
 	return err == nil
 }
 
-func (q QuoteInteractor) UserSaveFavoriteQuote(userID int, quoteID int) error {
+// func (q QuoteInteractor) QuoteExists(quoteID int) bool {
+// 	_, err := q.QuoteRepository.FindByID(quoteID)
+// 	return err == nil
+// }
+
+func (q QuoteInteractor) UserSaveFavoriteQuote(userID int, quoteData domain.Quote) error {
 	// Check the quote id in the database
+	// Use FindByID to check if the quote exists
 	// - if not save the quote in the database to quotes table
+	quote, err := q.QuoteRepository.FindByID(quoteData.ID)
+	if err != nil && quote.ID == 0 {
+		log.Println("Quote not found, save it to the database then")
+		err = q.QuoteRepository.Save(quoteData)
+		if err != nil {
+			return err
+		}
+	}
+	// Check if userID is in the database
+	// userExist := q.UserInteractor.UserExists(userID)
+	checkUserExist := func(userID int) bool {
+		_, err := q.UserInteractor.UserRepository.FindByID(userID)
+		return err == nil
+	}
+	userExist := checkUserExist(userID)
+	if !userExist {
+		return domain.ErrorUserNotFound
+	}
 	// save the user id and quote id in the database to userfavoritequotes table
+	err = q.QuoteRepository.SaveUserFavorite(userID, quoteData.ID)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
