@@ -22,6 +22,31 @@ jobs:
         - name: Running Unit-Test-Main-Svc
           working-directory: ./main-svc
           run: go test ./... -cover
+  build-main-svc:
+    name: "Build Main-SVC Image"
+    runs-on: ubuntu-latest
+    env:
+      HASH: $(git rev-parse --short "$GITHUB_SHA")
+      BRANCH: ${GITHUB_REF##*/}
+      SERVICE_NAME: ${{ secrets.GCP_APP_NAME }}
+      PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: google-github-actions/setup-gcloud@master
+        with:
+          service_account_key: ${{ secrets.GCP_CREDENTIALS }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          export_default_credentials: true
+      - name: Image
+        run: |-
+          docker build --build-arg -t gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA ./main-svc/.
+      - run: |
+          gcloud auth configure-docker -q
+      - name: Build
+        run: |-
+          docker push gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA
+
 
 #   build-push-docker:
 #     name: Build docker image then push to docker hub
@@ -39,23 +64,23 @@ jobs:
 #       - name: Push image to Docker Hub
 #         run: docker push zeinfahrozi/main-svc:latest
    
-  deploy:
-        name: Setup Gcloud Account
-        needs: "unit-test"
-        runs-on: ubuntu-latest
-        env:
-          IMAGE_NAME: gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_APP_NAME }}
-        steps:
+#   deploy:
+#         name: Setup Gcloud Account
+#         needs: "unit-test"
+#         runs-on: ubuntu-latest
+#         env:
+#           IMAGE_NAME: gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_APP_NAME }}
+#         steps:
 
-        - name: Login
-          uses: google-github-actions/setup-gcloud@master
-          with:
-            project_id: ${{ secrets.GCP_PROJECT_ID }}
-            service_account_email: ${{ secrets.GCP_EMAIL }}
-            service_account_key: ${{ secrets.GCP_CREDENTIALS }}
+#         - name: Login
+#           uses: google-github-actions/setup-gcloud@master
+#           with:
+#             project_id: ${{ secrets.GCP_PROJECT_ID }}
+#             service_account_email: ${{ secrets.GCP_EMAIL }}
+#             service_account_key: ${{ secrets.GCP_CREDENTIALS }}
 
-        - name: Configure Docker
-          run: gcloud auth configure-docker --quiet
+#         - name: Configure Docker
+#           run: gcloud auth configure-docker --quiet
 
 #         - name: Checkout repository
 #           uses: actions/checkout@v2
@@ -70,5 +95,5 @@ jobs:
 #         - name: Push Docker image
 #           run: docker push $IMAGE_NAME
 
-        - name: Deploy Docker image
-          run: gcloud run deploy ${{ secrets.GCP_PROJECT_ID }} --image registry.hub.docker.com/${{ secrets.DOCKERHUB_USERNAME }}/main-svc:latest --region us-central1 --platform managed
+#         - name: Deploy Docker image
+#           run: gcloud run deploy ${{ secrets.GCP_PROJECT_ID }} --image registry.hub.docker.com/${{ secrets.DOCKERHUB_USERNAME }}/main-svc:latest --region us-central1 --platform managed
