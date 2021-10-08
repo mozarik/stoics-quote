@@ -48,6 +48,7 @@ jobs:
         labels: github-action-build
         # Whether to push the image
         push: true
+        
     
       
 #   build-and-push-to-gcr:
