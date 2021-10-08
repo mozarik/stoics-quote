@@ -41,14 +41,13 @@ jobs:
         # Comma-delimited list of tags. These will be added to the registry/repository to form the image's tags
         tags: latest
         # Automatically tags the built image with the git reference as per the readme
-        tag_with_ref: true
+        tag_with_ref: false
         # Automatically tags the built image with the git short SHA as per the readme
-        tag_with_sha: true
+        tag_with_sha: false
         # Comma-delimited list of labels to add to the built image
         labels: github-action-build
         # Whether to push the image
         push: true
-          
     
       
 #   build-and-push-to-gcr:
