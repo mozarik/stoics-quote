@@ -33,7 +33,7 @@ jobs:
           registry: gcr.io
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           image_name: main-svc
-          image_tag: latest,v1
+          image_tag: latest
           context: ./main-svc
           dockerfile: ./main-svc/Dockerfile
           
