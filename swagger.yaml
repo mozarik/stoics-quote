@@ -69,10 +69,47 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/QuoteNotFoundResponse'
+  /quote/{quoteId}/save:
+    post:
+      tags:
+        - Quote
+      summary: Save favorite Quote 
+      parameters:
+        - in: path
+          name: quoteId
+          required: true
+          schema:
+            type: integer
+          description: quote id to be saved
+      responses:
+        '200':
+          description: Quote saved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Message to be displayed
+                    example: "Success saved quote as favorite"
+        '401':
+          description: Unauthorized User
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericUnauthorized'
+          
             
 
 components:
   schemas:
+    GenericUnauthorized:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "User is unauthorized"
     QuoteResponseData:
       type: object
       properties:
