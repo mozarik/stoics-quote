@@ -51,9 +51,123 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserResponseData'
+  /quote:
+    get:
+      tags:
+        - Quote
+      summary: Return a random quote
+      responses:
+        '200':
+          description: Returned a random quote
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteResponseData'
+        '404':
+          description: No quotes found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteNotFoundResponse'
+  /quote/{quoteId}/save:
+    post:
+      tags:
+        - Quote
+      summary: Save favorite Quote 
+      parameters:
+        - in: path
+          name: quoteId
+          required: true
+          schema:
+            type: integer
+          description: quote id to be saved
+      responses:
+        '200':
+          description: Quote saved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Message to be displayed
+                    example: "Success saved quote as favorite"
+        '401':
+          description: Unauthorized User
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericUnauthorized'
+  /quote/favorites/{userId}:
+    get:
+      tags:
+        - Quote
+      summary: Return all favorite quotes for a user
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+          description: UserID to be searched
+      responses:
+        '200':
+          description: Returned all favorite quotes for a user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/QuoteResponseData'
+        '404':
+          description: No quotes found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteNotFoundResponse'
+
 
 components:
   schemas:
+    AllUserFavoriteQuote:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          description: user id
+          example: 1
+        quotes:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteResponseData'
+    GenericUnauthorized:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "User is unauthorized"
+    QuoteResponseData:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        body:
+          type: string 
+          example: "Not all man die whining"
+        author:
+          type: string
+          example: "Marcus Aurelius"
+        quote_source:
+          type: string 
+          example: "Meditation XVII"
+    QuoteNotFoundResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Quotes not found"
     UserResponseData:
       type: object
       properties:
