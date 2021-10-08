@@ -22,54 +22,54 @@ jobs:
         - name: Running Unit-Test-Main-Svc
           working-directory: ./main-svc
           run: go test ./... -cover
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
+#   build:
+#     runs-on: ubuntu-latest
+#     steps:
+#     - uses: actions/checkout@v2
 
-    - name: Build and push Docker images
-      uses: docker/build-push-action@v1.1.0
-      with:
-        # Username used to log in to a Docker registry. If not set then no login will occur
-        username: _json_key
-        # Password or personal access token used to log in to a Docker registry. If not set then no login will occur
-        password: ${{ secrets.GCP_CREDENTIALS }}
-        # Server address of Docker registry. If not set then will default to Docker Hub
-        registry: gcr.io
-        # Docker repository to tag the image with
-        repository: ${{ secrets.GCP_PROJECT_ID }}/main-svc
-        # Comma-delimited list of tags. These will be added to the registry/repository to form the image's tags
-        tags: latest
-        # Automatically tags the built image with the git reference as per the readme
-        tag_with_ref: false
-        # Automatically tags the built image with the git short SHA as per the readme
-        tag_with_sha: false
-        # Comma-delimited list of labels to add to the built image
-        labels: github-action-build
-        # Whether to push the image
-        push: true
-        context: main-svc
-        dockerfile: ./main-svc/Dockerfile
+#     - name: Build and push Docker images
+#       uses: docker/build-push-action@v1.1.0
+#       with:
+#         # Username used to log in to a Docker registry. If not set then no login will occur
+#         username: _json_key
+#         # Password or personal access token used to log in to a Docker registry. If not set then no login will occur
+#         password: ${{ secrets.GCP_CREDENTIALS }}
+#         # Server address of Docker registry. If not set then will default to Docker Hub
+#         registry: gcr.io
+#         # Docker repository to tag the image with
+#         repository: ${{ secrets.GCP_PROJECT_ID }}/main-svc
+#         # Comma-delimited list of tags. These will be added to the registry/repository to form the image's tags
+#         tags: latest
+#         # Automatically tags the built image with the git reference as per the readme
+#         tag_with_ref: false
+#         # Automatically tags the built image with the git short SHA as per the readme
+#         tag_with_sha: false
+#         # Comma-delimited list of labels to add to the built image
+#         labels: github-action-build
+#         # Whether to push the image
+#         push: true
+#         context: main-svc
+#         dockerfile: ./main-svc/Dockerfile
         
     
       
-#   build-and-push-to-gcr:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - uses: actions/checkout@v2
-#       - name: Get the tag name
-#         id: get_tag_name
-#         run: echo ::set-output name=GIT_TAG_NAME::${GITHUB_REF/refs\/tags\//}
-#       - uses: google-github-actions/setup-gcloud@master
-#       - uses: RafikFarhad/push-to-gcr-github-action@v4
-#         with:
-#           gcloud_service_key: ${{ secrets.JSON_GCP_BASE64 }}
-#           registry: gcr.io
-#           project_id: ${{ secrets.GCP_PROJECT_ID }}
-#           image_name: main-svc
-#           image_tag: latest,${{ steps.get_tag_name.outputs.GIT_TAG_NAME }}
-#           context: main-svc
-#           dockerfile: ./main-svc/Dockerfile
+  build-and-push-to-gcr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get the tag name
+        id: get_tag_name
+        run: echo ::set-output name=GIT_TAG_NAME::${GITHUB_REF/refs\/tags\//}
+      - uses: google-github-actions/setup-gcloud@master
+      - uses: RafikFarhad/push-to-gcr-github-action@v4
+        with:
+          gcloud_service_key: ${{ secrets.JSON_GCP_BASE64 }}
+          registry: gcr.io
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          image_name: main-svc
+          image_tag: latest,${{ steps.get_tag_name.outputs.GIT_TAG_NAME }}
+          context: main-svc
+          dockerfile: ./main-svc/Dockerfile
           
 
 
