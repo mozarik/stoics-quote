@@ -38,8 +38,9 @@ jobs:
           service_account_key: ${{ secrets.GCP_CREDENTIALS }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           export_default_credentials: true
+          context: ./main-svc/
+          file: ./main-svc/Dockerfile   
       - name: Image
-        working-directory: ./main-svc
         run: |-
           docker build --build-arg -t gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA .
       - run: |
