@@ -27,13 +27,14 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+      - uses: actions/checkout@v2
+        name: Check out code
       - uses: mr-smithers-excellent/docker-build-push@v5
         name: Build & push Docker image
         with:
           image: main-svc
           tags: v1, latest
           registry: gcr.io
-          directory: ./main-svc/
           dockerfile: ./main-svc/Dockerfile
           username: _json_key
           password: ${{ secrets.GCP_CREDENTIALS }}
