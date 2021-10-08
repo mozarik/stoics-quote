@@ -23,22 +23,31 @@ jobs:
           working-directory: ./main-svc
           run: go test ./... -cover
   build:
-    name: "Build docker image and push to GCR"
     runs-on: ubuntu-latest
-    env:
-      IMAGE_NAME: gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_APP_NAME }}
     steps:
-      - uses: actions/checkout@v2
-        name: Check out code
-      - uses: mr-smithers-excellent/docker-build-push@v5
-        name: Build & push Docker image
-        with:
-          image: $IMAGE_NAME
-          tags: v1, latest
-          registry: gcr.io
-          dockerfile: ./main-svc/Dockerfile
-          username: _json_key
-          password: ${{ secrets.GCP_CREDENTIALS }}
+    - uses: actions/checkout@v2
+
+    - name: Build and push Docker images
+      uses: docker/build-push-action@v1.1.0
+      with:
+        # Username used to log in to a Docker registry. If not set then no login will occur
+        username: _json_key
+        # Password or personal access token used to log in to a Docker registry. If not set then no login will occur
+        password: ${{ secrets.GCP_CREDENTIALS }}
+        # Server address of Docker registry. If not set then will default to Docker Hub
+        registry: gcr.io
+        # Docker repository to tag the image with
+        repository: ${{ secrets.GOOGLE_PROJECT_ID }}/main-svc
+        # Comma-delimited list of tags. These will be added to the registry/repository to form the image's tags
+        tags: latest
+        # Automatically tags the built image with the git reference as per the readme
+        tag_with_ref: true
+        # Automatically tags the built image with the git short SHA as per the readme
+        tag_with_sha: true
+        # Comma-delimited list of labels to add to the built image
+        labels: github-action-build
+        # Whether to push the image
+        push: true
           
     
       
