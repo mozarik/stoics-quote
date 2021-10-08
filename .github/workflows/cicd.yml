@@ -67,7 +67,7 @@ jobs:
           registry: gcr.io
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           image_name: main-svc
-          image_tag: latest,${{ steps.get_tag_name.outputs.GIT_TAG_NAME }}
+          image_tag: latest
           context: main-svc
           dockerfile: ./main-svc/Dockerfile
           
