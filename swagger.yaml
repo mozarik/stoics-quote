@@ -99,11 +99,48 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GenericUnauthorized'
-          
-            
+  /quote/favorites/{userId}:
+    get:
+      tags:
+        - Quote
+      summary: Return all favorite quotes for a user
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+          description: UserID to be searched
+      responses:
+        '200':
+          description: Returned all favorite quotes for a user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/QuoteResponseData'
+        '404':
+          description: No quotes found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteNotFoundResponse'
+
 
 components:
   schemas:
+    AllUserFavoriteQuote:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          description: user id
+          example: 1
+        quotes:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteResponseData'
     GenericUnauthorized:
       type: object
       properties:
