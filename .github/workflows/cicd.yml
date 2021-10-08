@@ -24,7 +24,7 @@ jobs:
           run: go test ./... -cover
   build:
     name: "Build docker image and push to GCR"
-    runs-on: ubuntu:latest
+    runs-on: ubuntu-latest
     
     steps:
       - uses: mr-smithers-excellent/docker-build-push@v5
