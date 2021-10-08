@@ -22,23 +22,40 @@ jobs:
         - name: Running Unit-Test-Main-Svc
           working-directory: ./main-svc
           run: go test ./... -cover
-  build-and-push-to-gcr:
-    runs-on: ubuntu-latest
+  build:
+    name: "Build docker image and push to GCR"
+    runs-on: ubuntu:latest
+    
     steps:
-      - uses: actions/checkout@v2
-      - name: Get the tag name
-        id: get_tag_name
-        run: echo ::set-output name=GIT_TAG_NAME::${GITHUB_REF/refs\/tags\//}
-      - uses: google-github-actions/setup-gcloud@master
-      - uses: RafikFarhad/push-to-gcr-github-action@v4
+      - uses: mr-smithers-excellent/docker-build-push@v5
+        name: Build & push Docker image
         with:
-          gcloud_service_key: ${{ secrets.JSON_GCP_BASE64 }}
+          image: main-svc
+          tags: v1, latest
           registry: gcr.io
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          image_name: main-svc
-          image_tag: latest,${{ steps.get_tag_name.outputs.GIT_TAG_NAME }}
-          context: main-svc
-          dockerfile: ./main-svc/Dockerfile
+          dockerfile: Dockerfile
+          username: _json_key
+          password: ${{ secrets.GCP_CREDENTIALS }}
+          directory: ./main-svc
+    
+      
+#   build-and-push-to-gcr:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: Get the tag name
+#         id: get_tag_name
+#         run: echo ::set-output name=GIT_TAG_NAME::${GITHUB_REF/refs\/tags\//}
+#       - uses: google-github-actions/setup-gcloud@master
+#       - uses: RafikFarhad/push-to-gcr-github-action@v4
+#         with:
+#           gcloud_service_key: ${{ secrets.JSON_GCP_BASE64 }}
+#           registry: gcr.io
+#           project_id: ${{ secrets.GCP_PROJECT_ID }}
+#           image_name: main-svc
+#           image_tag: latest,${{ steps.get_tag_name.outputs.GIT_TAG_NAME }}
+#           context: main-svc
+#           dockerfile: ./main-svc/Dockerfile
           
 
 
