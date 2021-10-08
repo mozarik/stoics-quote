@@ -48,6 +48,8 @@ jobs:
         labels: github-action-build
         # Whether to push the image
         push: true
+        context: main-svc
+        dockerfile: ./main-svc/Dockerfile
         
     
       
