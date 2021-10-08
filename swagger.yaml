@@ -51,9 +51,49 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserResponseData'
+  /quote:
+    get:
+      tags:
+        - Quote
+      summary: Return a random quote
+      responses:
+        '200':
+          description: Returned a random quote
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteResponseData'
+        '404':
+          description: No quotes found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteNotFoundResponse'
+            
 
 components:
   schemas:
+    QuoteResponseData:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        body:
+          type: string 
+          example: "Not all man die whining"
+        author:
+          type: string
+          example: "Marcus Aurelius"
+        quote_source:
+          type: string 
+          example: "Meditation XVII"
+    QuoteNotFoundResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Quotes not found"
     UserResponseData:
       type: object
       properties:
