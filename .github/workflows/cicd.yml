@@ -29,7 +29,7 @@ jobs:
       - uses: google-github-actions/setup-gcloud@master
       - uses: RafikFarhad/push-to-gcr-github-action@v4
         with:
-          gcloud_service_key: ${{ secrets.GCP_CREDENTIALS }}
+          gcloud_service_key: ${{ secrets.JSON_GCP_BASE64 }}
           registry: gcr.io
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           image_name: main-svc
