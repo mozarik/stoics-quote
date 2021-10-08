@@ -56,18 +56,18 @@ jobs:
         - name: Configure Docker
           run: gcloud auth configure-docker --quiet
 
-        - name: Checkout repository
-          uses: actions/checkout@v2
+#         - name: Checkout repository
+#           uses: actions/checkout@v2
 
-        - name: Build Docker image
-          run: |
-            docker build -t $IMAGE_NAME ./main-svc/.
+#         - name: Build Docker image
+#           run: |
+#             docker build -t $IMAGE_NAME 
 
-        - name: Test Docker image
-          run: docker run $IMAGE_NAME sh -c "go test -v"
+#         - name: Test Docker image
+#           run: docker run $IMAGE_NAME sh -c "go test -v"
 
-        - name: Push Docker image
-          run: docker push $IMAGE_NAME
+#         - name: Push Docker image
+#           run: docker push $IMAGE_NAME
 
         - name: Deploy Docker image
-          run: gcloud run deploy ${{ secrets.GCP_PROJECT_ID }} --image $IMAGE_NAME --region us-central1 --platform managed
+          run: gcloud run deploy ${{ secrets.GCP_PROJECT_ID }} --image registry.hub.docker.com/${{ secrets.DOCKERHUB_USERNAME }}/main-svc:latest --region us-central1 --platform managed
