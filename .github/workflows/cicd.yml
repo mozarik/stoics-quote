@@ -40,7 +40,7 @@ jobs:
           export_default_credentials: true
       - name: Image
         run: |-
-          docker build --no-cache -t gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA -f main-svc/Dockerfile context
+          docker build --no-cache -t gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA -f ./main-svc/Dockerfile context
       - run: |
           gcloud auth configure-docker -q
       - name: Build
