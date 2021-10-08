@@ -33,10 +33,11 @@ jobs:
           image: main-svc
           tags: v1, latest
           registry: gcr.io
-          dockerfile: Dockerfile
+          directory: ./main-svc/
+          dockerfile: ./main-svc/Dockerfile
           username: _json_key
           password: ${{ secrets.GCP_CREDENTIALS }}
-          directory: ./main-svc/
+          
     
       
 #   build-and-push-to-gcr:
