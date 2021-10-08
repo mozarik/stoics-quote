@@ -61,7 +61,7 @@ jobs:
 
         - name: Build Docker image
           run: |
-            docker build -t $IMAGE_NAME ./main-svc
+            docker build -t $IMAGE_NAME ./main-svc/.
 
         - name: Test Docker image
           run: docker run $IMAGE_NAME sh -c "go test -v"
