@@ -14,6 +14,19 @@ type QuoteInteractor struct {
 	QuoteRepository domain.QuoteRepository
 }
 
+func NewUserInteractor(ur domain.UserRepository) *UserInteractor {
+	return &UserInteractor{
+		UserRepository: ur,
+	}
+}
+
+func NewQuoteInteractor(ur UserInteractor, qr domain.QuoteRepository) *QuoteInteractor {
+	return &QuoteInteractor{
+		UserInteractor:  ur,
+		QuoteRepository: qr,
+	}
+}
+
 type User struct {
 	ID       int
 	Name     string

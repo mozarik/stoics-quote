@@ -17,4 +17,12 @@ services:
       dockerfile: Dockerfile
     ports:
       - 3002:3002
+  my-sql-svc:
+    env_file:
+        - ./my-sql-svc/.env
+    build:
+      context: ./my-sql-svc
+      dockerfile: Dockerfile
+    ports:
+      - 3306:3306
     
