@@ -22,30 +22,20 @@ jobs:
         - name: Running Unit-Test-Main-Svc
           working-directory: ./main-svc
           run: go test ./... -cover
-  build-main-svc:
-    name: "Build Main-SVC Image"
+  build-and-push-to-gcr:
     runs-on: ubuntu-latest
-    env:
-      HASH: $(git rev-parse --short "$GITHUB_SHA")
-      BRANCH: ${GITHUB_REF##*/}
-      SERVICE_NAME: ${{ secrets.GCP_APP_NAME }}
-      PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
       - uses: google-github-actions/setup-gcloud@master
+      - uses: RafikFarhad/push-to-gcr-github-action@v4
         with:
-          service_account_key: ${{ secrets.GCP_CREDENTIALS }}
+          gcloud_service_key: ${{ secrets.GCP_CREDENTIALS }}
+          registry: gcr.io
           project_id: ${{ secrets.GCP_PROJECT_ID }}
-          export_default_credentials: true
-      - name: Image
-        run: |-
-          docker build --no-cache -t gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA -f ./main-svc/Dockerfile context
-      - run: |
-          gcloud auth configure-docker -q
-      - name: Build
-        run: |-
-          docker push gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA
+          image_name: main-svc
+          image_tag: latest,v1
+          dockerfile: ./docker/Dockerfile
+          context: ./main-svc
 
 
 #   build-push-docker:
