@@ -26,6 +26,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Get the tag name
+        id: get_tag_name
+        run: echo ::set-output name=GIT_TAG_NAME::${GITHUB_REF/refs\/tags\//}
       - uses: google-github-actions/setup-gcloud@master
       - uses: RafikFarhad/push-to-gcr-github-action@v4
         with:
@@ -33,7 +36,7 @@ jobs:
           registry: gcr.io
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           image_name: main-svc
-          image_tag: latest,v1
+          image_tag: latest,${{ steps.get_tag_name.outputs.GIT_TAG_NAME }}
           context: ./main-svc
           dockerfile: ./main-svc/Dockerfile
           
