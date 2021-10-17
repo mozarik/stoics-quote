@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"main-svc/domain"
 	"math/rand"
 	"net/http"
 	"time"
 )
 
 type QuoteGetter interface {
-	GetQuoteResponseBody() ([]byte, error)
+	GetQuoteResponseBody() (Quote, error)
 }
 
 type Quote struct {
@@ -34,7 +35,27 @@ func init() {
 }
 
 type QuoteGetterImpl struct {
-	QuoteGetter QuoteGetter
+	QuoteSaver QuoteSaver
+}
+
+type QuoteSaver interface {
+	SaveQuote(quote domain.Quote) error
+}
+
+type QuoteSaverImpl struct {
+	QRepo domain.QuoteRepository
+}
+
+func (qs *QuoteSaverImpl) SaveQuote(quoteData domain.Quote) error {
+	quote, err := qs.QRepo.FindByID(quoteData.ID)
+	if err != nil && quote.ID == 0 {
+		log.Println("Quote not found, save it to the database then")
+		err = qs.QRepo.Save(quoteData)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func RandomNumberRange(min, max int) int {
@@ -69,4 +90,24 @@ func GetQuoteFromThirdPartyAPI() (Quote, error) {
 	}
 
 	return quote[0], nil
+}
+
+func (qg *QuoteGetterImpl) GetQuoteResponseBody() (Quote, error) {
+	quote, err := GetQuoteFromThirdPartyAPI()
+	if err != nil {
+		log.Printf("cannot get quote from third party api error: %v", err)
+		return quote, err
+	}
+	quoteToDomain := domain.Quote{
+		ID:          quote.ID,
+		Body:        quote.Body,
+		Author:      quote.Author,
+		QuoteSource: quote.QuoteSource,
+	}
+	err = qg.QuoteSaver.SaveQuote(quoteToDomain)
+	if err != nil {
+		log.Printf("cannot save quote to database error: %v", err)
+		return quote, err
+	}
+	return quote, nil
 }
