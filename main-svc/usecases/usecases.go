@@ -3,6 +3,7 @@ package usecases
 import (
 	"log"
 	"main-svc/domain"
+	"main-svc/interfaces"
 )
 
 type UserInteractor struct {
@@ -12,6 +13,7 @@ type UserInteractor struct {
 type QuoteInteractor struct {
 	UserInteractor  UserInteractor
 	QuoteRepository domain.QuoteRepository
+	QuoteGetter     interfaces.QuoteGetter
 }
 
 func NewUserInteractor(ur domain.UserRepository) *UserInteractor {
@@ -56,6 +58,18 @@ func (i UserInteractor) ShowUserDataBasedOnID(userID int) (User, error) {
 	userData.Name = user.Name
 	userData.Username = user.Username
 	return userData, nil
+}
+
+func (i UserInteractor) CreateUser(user domain.User) (User, error) {
+	var data User
+	userData, err := i.UserRepository.Store(user)
+	if err != nil {
+		return data, domain.ErrorUserAlreadyExists
+	}
+	data.ID = userData.ID
+	data.Name = userData.Name
+	data.Username = userData.Username
+	return data, nil
 }
 
 // Check if userID is in the database
@@ -126,4 +140,12 @@ func (q QuoteInteractor) ListAllFavoriteQuotes(userID int) (UserFavoriteQuotes, 
 	}
 
 	return aggregate, nil
+}
+
+func (q QuoteInteractor) GetQuote() (interfaces.Quote, error) {
+	quote, err := q.QuoteGetter.GetQuoteResponseBody()
+	if err != nil {
+		return interfaces.Quote{}, err
+	}
+	return quote, nil
 }

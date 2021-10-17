@@ -3,7 +3,8 @@ package domain
 import "errors"
 
 var (
-	ErrorUserNotFound = errors.New("user with corresponding id is not found")
+	ErrorUserNotFound      = errors.New("user with corresponding id is not found")
+	ErrorUserAlreadyExists = errors.New("user with corresponding id already exists")
 )
 
 type UserRepository interface {

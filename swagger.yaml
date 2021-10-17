@@ -99,18 +99,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GenericUnauthorized'
-  /quote/favorites/{userId}:
+  /quote/favorites/:
     get:
       tags:
         - Quote
       summary: Return all favorite quotes for a user
-      parameters:
-        - in: path
-          name: userId
-          required: true
-          schema:
-            type: integer
-          description: UserID to be searched
+      # parameters:
+      #   - in: path
+      #     name: userId
+      #     required: true
+      #     schema:
+      #       type: integer
+      #     description: UserID to be searched
       responses:
         '200':
           description: Returned all favorite quotes for a user
