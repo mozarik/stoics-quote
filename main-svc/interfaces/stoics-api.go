@@ -46,6 +46,18 @@ type QuoteSaverImpl struct {
 	QRepo domain.QuoteRepository
 }
 
+func NewQuoteGetter(qs QuoteSaver) QuoteGetter {
+	return &QuoteGetterImpl{
+		QuoteSaver: qs,
+	}
+}
+
+func ProvideQuoteSaver(qr domain.QuoteRepository) QuoteSaver {
+	return &QuoteSaverImpl{
+		QRepo: qr,
+	}
+}
+
 func (qs *QuoteSaverImpl) SaveQuote(quoteData domain.Quote) error {
 	quote, err := qs.QRepo.FindByID(quoteData.ID)
 	if err != nil && quote.ID == 0 {

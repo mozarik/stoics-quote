@@ -22,10 +22,11 @@ func NewUserInteractor(ur domain.UserRepository) *UserInteractor {
 	}
 }
 
-func NewQuoteInteractor(ur UserInteractor, qr domain.QuoteRepository) *QuoteInteractor {
+func NewQuoteInteractor(ur UserInteractor, qr domain.QuoteRepository, qg interfaces.QuoteGetter) *QuoteInteractor {
 	return &QuoteInteractor{
 		UserInteractor:  ur,
 		QuoteRepository: qr,
+		QuoteGetter:     qg,
 	}
 }
 
