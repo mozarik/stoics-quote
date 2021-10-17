@@ -18,6 +18,10 @@ func NewDbRepo(db *gorm.DB) *DbRepo {
 
 type UserRepo DbRepo
 
+func NewUserRepo(db *gorm.DB) *UserRepo {
+	return &UserRepo{DB: db}
+}
+
 // Implement domain.UserRepository interface
 func (repo UserRepo) FindByID(id int) (*domain.User, error) {
 	query := `SELECT u.id, u.name, u.username FROM users u WHERE u.id = @userID`

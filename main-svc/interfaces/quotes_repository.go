@@ -3,9 +3,15 @@ package interfaces
 import (
 	"database/sql"
 	"main-svc/domain"
+
+	"gorm.io/gorm"
 )
 
 type QuoteRepo DbRepo
+
+func NewQuoteRepo(db *gorm.DB) QuoteRepo {
+	return QuoteRepo{DB: db}
+}
 
 // Implement domain.QuoteRepository interface
 func (repo QuoteRepo) Save(quote domain.Quote) error {
